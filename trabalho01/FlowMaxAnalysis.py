@@ -26,25 +26,18 @@ import os
 def FlowMaxAnalysis(uf,repoPath):
        uf = 'GO'
        repoPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01"
-       dataDir =repoPath+'/'+'inputs/'+uf
-      
-       # Lista de arquivos dentro da pasta
+     
+      60810000_Vazoes
        dataList = os.listdir(dataDir)
-       print(dataList)
-       
-       # Mudando do diretório atual para o que foi colocado no dataDir. Faz com que a operação de leitura de arquivo seja relativa a pasta dataDir.
-       os.chdir(dataDir) 
+       print(dataList)       
        
        # Criando lista vazia
        allFiles  =[]
-       # Como eu só quero ler a planilha das vazões não precisa de loop
-
-       #Caminho para os dados
-       aqPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01\inputs\GO\60810000_Vazoes.csv"
        
        # Abrir os dados de vazão, objeto de estudo, em um dataframe
        # Função par apular linhas == skiprows=15 
-       dfConc = pd.read_csv(aqPath, encoding='latin1', sep=';', engine='python', quotechar='"', skiprows=15)
+       dfConc = pd.read_csv(dataDir, encoding='latin1', sep=';', engine='python', quotechar='"', skiprows=15)
+       
        allFiles.append(dfConc)
   
        # Concatenando o DataFrame lidos
