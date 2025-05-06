@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May  3 19:36:49 2025
+
+@author: Usuario
+"""
 
 """
 Created on Thu May  1 15:02:43 2025
@@ -8,12 +14,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-from matplotlib import datetime
+from datetime import datetime
 import statsmodels.api as sm
 
 uf= 'GO'
 repoPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01"
-aqPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01\outputs\GO\flowBica.csv"
+aqPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01\outputs\GO\flow.csv"
 
 #lendo o arquivo 
 aqData = pd.read_csv(aqPath)
@@ -36,10 +42,8 @@ aqData['flow'] = aqData['flow'].fillna(mean_flow)
 # Função para decomposição da série temporal
 def timeSeriesDecompose(aqData, uf, repoPath):
     # Decomposição da série temporal
-    #Transformar datitime em um indice 
-    aqData['datetime'] = pd.to_datetime(aqData['Date'], format='%Y-%m-%d')  # Exemplo de conversão
-
-    # Seleciona apenas a coluna vazão e do tempo
+    
+    # Seleciona apenas a coluna dos poluentes (vazão no caso)
     dataDecompose = aqData[['datetime', 'flow']]
    
     # Garantir que a coluna 'datetime' está no formato datetime
@@ -70,24 +74,36 @@ def timeSeriesDecompose(aqData, uf, repoPath):
     # Gerando figura para a decomposição
     fig, axes = plt.subplots(ncols=1, nrows=4, sharex=True, figsize=(10, 8))
     
-    res.observed.plot(ax=axes[0], legend=False, color='blue')
+    res.observed.plot(ax=axes[0], legend=False, color='green')
     axes[0].set_ylabel('Original')
     axes[0].set_title('Decomposição da Série Temporal (Vazão)')
     
-    res.trend.plot(ax=axes[1], legend=False, color='pink')
+    res.trend.plot(ax=axes[1], legend=False, color='red')
     axes[1].set_ylabel('Tendência')
     
-    res.seasonal.plot(ax=axes[2], legend=False, color='purple')
+    res.seasonal.plot(ax=axes[2], legend=False, color='yellow')
     axes[2].set_ylabel('Sazonalidade')
     
     res.resid.plot(ax=axes[3], legend=False, color='gray')
-    axes[3].set_ylabel('Resíduo')
+    axes[3].set_ylabel('Ruído')
     
     fig.tight_layout()
     
     # Salvar figura
-    fig.savefig(repoPath+'/figuras/'+uf+'/DecomposicaoBica.png', bbox_inches='tight')
+    fig.savefig(repoPath+'/figuras/'+uf+'/Decomposicao.png', bbox_inches='tight')
     
     return fig
 
+# Chamada da função com os dados de vazão
+uf = 'GO'  # Exemplo de Unidade Federativa
+repoPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01"
+aqPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01\outputs\GO\flow.csv"
 
+# Lendo os dados de vazão
+flow_data = pd.read_csv(aqPath)
+
+# Certifique-se de que a coluna 'datetime' está no formato datetime
+flow_data['datetime'] = pd.to_datetime(flow_data['datetime'])
+
+# Chamar a função de decomposição
+timeSeriesDecompose(flow_data, uf, repoPath)

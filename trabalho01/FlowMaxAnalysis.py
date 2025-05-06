@@ -26,22 +26,23 @@ import os
 def FlowMaxAnalysis(uf,repoPath):
        uf = 'GO'
        repoPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01"
-     
-      60810000_Vazoes
+       dataDir = repoPath+'/'+'inputs'+'/'+uf
        dataList = os.listdir(dataDir)
        print(dataList)       
        
+       # faz com que a operação de leitura de arquivo seja relativa a pasta dataDir.
+       os.chdir(dataDir)
        # Criando lista vazia
        allFiles  =[]
        
        # Abrir os dados de vazão, objeto de estudo, em um dataframe
        # Função par apular linhas == skiprows=15 
-       dfConc = pd.read_csv(dataDir, encoding='latin1', sep=';', engine='python', quotechar='"', skiprows=15)
+      
+       aqPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01\inputs\GO\60665000_Vazoes.csv"
        
-       allFiles.append(dfConc)
-  
-       # Concatenando o DataFrame lidos
-       aqData = pd.concat(allFiles)
+       aqData = pd.read_csv(aqPath, encoding='latin1', sep=';', engine='python', quotechar='"', skiprows=15)
+      
+       allFiles.append(aqData)
        
        # ignorando colunas desnecessárias, de horas (pq é = nam), coigo a bacia estatísticas
        
@@ -95,7 +96,6 @@ def FlowMaxAnalysis(uf,repoPath):
        # Organiza o resultado final
        #meltedDf = meltedDf[['Date', 'flow']]
        
-       #meltedDf.sort_values(by='Date', inplace=True)
        
        # Cria as colunas separadas
        meltedDf['year'] = meltedDf['Date'].dt.year
@@ -113,10 +113,12 @@ def FlowMaxAnalysis(uf,repoPath):
        os.makedirs(repoPath+'/'+'outputs/'+uf,exist_ok=True)
      
        #Salvando em csv 
-       meltedDf.to_csv(repoPath+'/'+'outputs/'+uf+'/'+'vazao_MEAN.csv')
+       meltedDf.to_csv(repoPath+'/'+'outputs/'+uf+'/'+'flowBica.csv')
 
-      
-       return  meltedDf
+      return  meltedDf
+   
+   
+
        
        
      

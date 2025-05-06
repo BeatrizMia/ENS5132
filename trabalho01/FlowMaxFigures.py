@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 27 17:55:03 2025
-
-@author: Beatriz and Bianca
-
-"""
-
+# -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -13,86 +7,51 @@ from scipy import stats
 import statsmodels.api as sm
 import pandas as pd
 
-      
 def FlowMaxHistograma(meltedDf,uf,repoPath):
     
-    uf = 'GO'
-    repoPath = r"C:\Users\Usuario\Documents\GitHub\ENS5132\trabalho01"
+    # Supondo que 'meltedDf' seja o seu DataFrame original e você queira remover os NaNs
+    dropnaDF = meltedDf.dropna()
+    
+
+    # Criando uma figura e um eixo
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Criando o histograma da coluna 'flow' com bins automáticos
+    n, bins, patches = ax.hist(dropnaDF['flow'], bins='auto', edgecolor='black', color='skyblue', label='Vazão')
+    
+    # Adicionando título e rótulos aos eixos
+    ax.set_title('Histograma da Vazão (flow)', fontsize=14)
+    ax.set_xlabel('Valor da Vazão (flow)', fontsize=12)
+    ax.set_ylabel('Frequência', fontsize=12)
+    
+    # Colocando os intervalos dos bins em cima das barras, na vertical
+    for i in range(len(bins)-1):
+        bin_left = bins[i]  # Pega o valor de início de cada intervalo
+        bin_right = bins[i+1]  # Pega o valor de fim de cada intervalo
+        # Exibindo o intervalo completo (bin_left - bin_right) acima da barra, na vertical
+        ax.text(
+            (bin_left + bin_right) / 2,  # Posição X: centro de cada bin
+            n[i],  # Posição Y: a altura da barra
+            f'{bin_left:.1f} - {bin_right:.1f}',  # Texto: Exibindo o intervalo completo
+            ha='center',  # Alinhamento horizontal no centro
+            va='bottom',  # Alinhamento vertical em relação à barra
+            fontsize=9,  # Tamanho da fonte
+            color='black',  # Cor do texto
+            rotation=90  # Texto rotacionado na vertical
+            )
+    
+    # Remover os valores do eixo X (já que estão sendo exibidos em cima das barras)
+    ax.set_xticklabels([])  # Remove os rótulos de texto no eixo X 
+
+    # Melhorando a legibilidade dos rótulos dos eixos
+    plt.xticks(rotation=45, fontsize=10, ha='right')
+    
+    # Ajustando o layout para garantir que nada seja cortado
+    plt.tight_layout()
+    
+    # Salvando o gráfico
+    fig.savefig(repoPath+'/figuras/'+uf+'/histograma.png', bbox_inches='tight')
+    
+    # Exibindo o gráfico
+    plt.show()
    
-    os.makedirs(repoPath+'/'+'figuras/'+uf, exist_ok=True)
-        
-    #Extraindo anos de analise 
-    datetime = np.unique(meltedDf.year)
-    print(datetime)
-        
-    # Criando figura, area de plotagem com o numero de anos
-    fig, ax = plt.subplot(Date.size)
-    #Extraindo poluentes para determinada estação
-    pollutants = np.unique(aqData[aqData.Estacao==st].Poluente)
-    
-    # Criando figura com número de poluentes de cada estação
-    fig, ax = plt.subplots(pollutants.size)
-    
-    # Loop para cada poluente
-    for ii, pol in enumerate(pollutants):
-        if pollutants.size>1:
-            ax[ii].plot(
-                aqData[(aqData.Estacao==st) & (aqData.Poluente == pol)].Valor)
-            fig.savefig(repoPath+'/figuras/'+uf+'/plot_'+st+'.png')
-        else:
-            ax.plot(
-                aqData[(aqData.Estacao==st) & (aqData.Poluente == pol)].Valor)
-            fig.savefig(repoPath+'/figuras/'+uf+'/plot_'+st+'.png')
-
-def normalityCheck(aqTableAlvo,repoPath,uf,stationAlvo,pol):
-    # Figura para verificar a distribuição dos dados 
-    fig, ax = plt.subplots(3)
-    ax[0].hist(np.log(aqTableAlvo[pol].dropna()),facecolor='red')
-    ax[0].set_title('Log')
-    ax[0].set_ylabel('Frequência')
-    ax[1].hist(stats.boxcox(aqTableAlvo[pol].dropna()),facecolor='green')
-    ax[1].set_title('Boxcox')
-    ax[1].set_ylabel('Frequência')
-    ax[2].hist(aqTableAlvo[pol].dropna())
-    ax[2].set_title('Dado original')
-    ax[2].set_ylabel('Frequência')
-    fig.tight_layout() 
-    fig.savefig(repoPath+'/figuras/'+uf+'/histogramDataNormalization_'+pol+'_'+stationAlvo+'.png')
-    return fig
-
-def trendFigures(data,result):
-    fig, ax = plt.subplots(2)
-    sm.graphics.tsa.plot_acf(data, lags=5, ax=ax[0]);
-    ax[0].set_title('Autocorrelação ACF')
-    trend_line = np.arange(len(data)) * result.slope + result.intercept
-    data.plot(ax=ax[1])
-    ax[1].plot(data.index, trend_line)
-    ax[1].legend(['data', 'trend line'])
-    ax[1].set_title('Tendência')
-    return fig
-
-def timeSeriesForecast(complete_data,repoPath,uf,pol,stationAlvo):
-    # Previsão usando modelo de série temporal
-    # pip install pmdarima
-    from pmdarima.arima import auto_arima
-
-    stepwise_model = auto_arima(complete_data, start_p=1,start_q=1,max_p=3,max_q=3,m=12,
-                       seasonal=True, error_action='ignore')
-
-    print(stepwise_model.aic())
-    
-    # Segregando grupo de treinamento e test 
-    train = pd.DataFrame({'train':complete_data.iloc[0:int(complete_data.shape[0]*0.7)]})
-    test = pd.DataFrame({'test':complete_data.iloc[int(complete_data.shape[0]*0.7):]})
-    
-    # Calibrando o modelo
-    stepwise_model.fit(train)
-    
-    #
-    future_forecast = pd.DataFrame({'future_forecast':stepwise_model.predict(n_periods=test.shape[0])})
-    
-    fig, axes = plt.subplots()
-    #pd.concat([test,future_forecast],axis=1).dropna(axis='rows').plot() 
-    pd.concat([complete_data,future_forecast],axis=1).plot(ax=axes) 
-    fig.savefig(repoPath+'/figuras/'+uf+'/timeSeriesForecast'+pol+'_'+stationAlvo+'.png')
-    return fig
